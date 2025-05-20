@@ -10,7 +10,7 @@ HypeDrop is a music snippet discovery platform that allows artists to upload tea
 
 ## Demo
 Live demo: [https://hype-drop-blond.vercel.app/]([https://your-demo-link.com](https://hype-drop-blond.vercel.app/))
-Video showcase: [YouTube video link]
+Video showcase: https://www.facebook.com/share/v/1Y2fjkS2bS/
 
 ## Tech Stack
 - React
