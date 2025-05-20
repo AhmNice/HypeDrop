@@ -69,7 +69,7 @@ useEffect(()=>{
               <div className="flex-1">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h1 className="InterRegular text-3xl font-bold text-gray-900 capitalize">{user.role ==='artist' ? user.stageName : user.role ==='user'? user.userName :''}</h1>
+                    <h1 className="InterRegular text-3xl font-bold text-gray-900 capitalize">{user?.role ==='artist' ? user.stageName : user.role ==='user'? user.userName :''}</h1>
                     <p className="text-purple-600">{user?.email}</p>
 
                       <span className="capitalize inline-block mt-2 px-3 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">

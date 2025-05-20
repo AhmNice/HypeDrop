@@ -25,7 +25,7 @@ const SnippetContainer = ({setTotalSnippets}) => {
       if (isAuthenticated && user) {
         setLoading(true);
         const payload = {
-          id: user._id,
+          id: user?._id,
         };
 
         try {
@@ -42,7 +42,8 @@ const SnippetContainer = ({setTotalSnippets}) => {
             const data = await res.json();
             setSnippets(data.results);
           } else {
-            toast.error('Error fetching snippets ');
+            // toast.error('Error fetching snippets ');
+            console.log('empty')
           }
         } catch (error) {
           toast.error(error.message);

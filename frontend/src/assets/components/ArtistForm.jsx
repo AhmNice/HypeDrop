@@ -60,6 +60,8 @@ const ArtistForm = () => {
       if (validateForm()) {
         localStorage.setItem("userType", "artist");
         await signup(formData);
+        navigate("/email-verification");
+        window.location.reload()
       }
     } catch (error) {
       console.error;
@@ -74,7 +76,7 @@ const ArtistForm = () => {
         return () => clearTimeout(timer);
       }
     }, 500);
-  }, [success, navigate]);
+  }, [success,navigate]);
 
   useEffect(() => {
     if (error) {
