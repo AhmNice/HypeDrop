@@ -1,0 +1,40 @@
+import mongoose from "mongoose";
+const TrendingSnippetsSchema = mongoose.Schema({
+  snippetId:{
+    type:String,
+    default:''
+  },
+  title:{
+    type:String,
+    default:''
+  },
+  owner:{
+    type:String,
+    default:''
+  },
+  audioPath:{
+    type:String,
+    default:''
+  },
+  coverPhotoPath:{
+    type:String,
+    default:''
+  },
+  position:{
+    type:Number,
+    default:''
+  },
+  totalPlays:{
+    type:String,
+    default:'0'
+  },
+  trend:{
+    type:String,
+    default:''
+  },
+  prevPosition:{
+    type:Number,
+    default:''
+  }
+})
+export const TrendingSnippets = mongoose.model('TrendingSnippet', TrendingSnippetsSchema)

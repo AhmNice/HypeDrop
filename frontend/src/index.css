@@ -1,0 +1,161 @@
+@import 'tailwindcss';
+@theme {
+  --color-darkSlateGray: #161C22;
+  --color-eerieBlack: #131920;
+  --color-charcoal: #181E24;
+  --color-brassYellow: #CCCA4A;
+  --color-deepSlateBlue: #324E56;
+}
+@font-face{
+  font-family: 'InterRegular';
+  src: url('./assets/fonts/Inter_18pt-Regular.ttf');
+}
+@font-face{
+  font-family: 'InterBold';
+  src: url('./assets/fonts/Inter_24pt-Bold.ttf');
+}
+@font-face{
+  font-family: 'SpaceGroteskRegular';
+  src: url('./assets/fonts/SpaceGrotesk-Regular.ttf');
+}
+@font-face{
+  font-family: 'SpaceGroteskBold';
+  src: url('./assets/fonts/SpaceGrotesk-Bold.ttf');
+}
+.InterRegular {
+  font-family: 'InterRegular';
+}
+
+.InterBold {
+  font-family: 'InterBold';
+}
+
+.SpaceGroteskRegular {
+  font-family: 'SpaceGroteskRegular';
+}
+
+.SpaceGroteskBold {
+  font-family: 'SpaceGroteskBold';
+}
+.overlay{
+  background-color: rgba(124, 123, 123, 0.7);
+}
+.trendingPage{
+  height: max-content;
+}
+
+@font-face {
+  font-family: rubik-bold;
+  src: url(./assets/fonts/Rubik/Rubik-Bold.ttf);
+}
+@font-face {
+  font-family: rubik-regular;
+  src: url(./assets/fonts/Rubik/Rubik-Regular.ttf);
+}
+@font-face {
+  font-family: lato-regular;
+  src: url(./assets/fonts/Lato/Lato-Regular.ttf);
+}
+@font-face {
+  font-family: lato-bold;
+  src: url(./assets/fonts/Lato/Lato-Bold.ttf);
+}
+.rubik-bold{
+  font-family: rubik-bold;
+}
+.rubik-regular{
+  font-family: rubik-regular;
+}
+.lato-regular{
+  font-family: lato-regular;
+}
+.lato-bold{
+  font-family: lato-bold;
+}
+body{
+  font-family: lato-regular;
+  @apply text-gray-900;
+}
+.bg-none{
+  background-color: transparent;
+  background: none;
+}
+
+label{
+  top: 10px;
+}
+input:focus ~label,input:not(:placeholder-shown)~label{
+  top: -8px;
+  font-size: 12px;
+}
+.gradient{
+  background: linear-gradient(#324E56 , #161C22);
+}
+.bg-home-gradient{
+  background: radial-gradient(#324E56, #161C22);
+}
+.navbar-menu {
+  transition: transform 0.3s ease, opacity 2s ease;
+  transition:transform 0.5s ease-in-out;
+}
+.navbar-menu-hidden {
+  transform: translateX(-100%);
+  transition: transform 0.5s ease-in-out;
+}
+
+.navbar-menu-visible {
+  transition: transform 0.5s ease-in-out;
+  transform: translateX(0%);
+  opacity: 1;
+}
+.slide-in{
+  animation: fadeInUp 0.5s forwards;
+  animation-delay: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+.fade-in{
+  animation: fadeInUp 0.5s forwards;
+  animation-delay: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+@layer utilities {
+  /* Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  /* Custom scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+}

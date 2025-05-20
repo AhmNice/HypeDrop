@@ -1,0 +1,57 @@
+import mongoose from "mongoose";
+const snippetSchema = mongoose.Schema({
+  title:{
+    type:String,
+    require:true,
+  },
+  artistName:{
+    type:String,
+    require:true
+  },
+  releaseDate:{
+    type:Date,
+    require:true,
+  },
+  audioPath:{
+    type:String,
+    require:true
+  },
+  coverPhotoPath:{
+    type:String,
+    require:true
+  },
+  owner:{
+    type:String,
+    require:true
+  },
+  totalPlays:{
+    type:String,
+    default:'0'
+  },
+  likes:{
+    type:String,
+    default:''
+  },
+  position:{
+    type:Number,
+    default:''
+  },
+  released:{
+    type:Boolean,
+    default:false
+  },
+  links:{
+    type:Object,
+    default:{
+      'audiomack':'',
+      'appleMusic':'',
+      'spotify':'',
+      'youTubeMusic':''
+    }
+  },
+  isDisabled:{
+    type:Boolean,
+    default:false
+  }
+},{timestamps:true})
+export const Snippet = mongoose.model("Snippet", snippetSchema)
