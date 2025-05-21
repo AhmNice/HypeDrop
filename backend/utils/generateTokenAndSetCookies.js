@@ -10,12 +10,13 @@ export const generateTokenAndSetCookies = (res, userId, role) => {
   const cookieName = 'userSession';
 
   res.cookie(cookieName, token, {
-    path:'/',
+    path: '/',
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'Strict',
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
+
 
   return token;
 };
