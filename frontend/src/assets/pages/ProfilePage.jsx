@@ -99,8 +99,8 @@ useEffect(()=>{
                 <TabButton active>Snippets</TabButton>
                 <TabButton>Liked</TabButton>
                 <TabButton>Playlists</TabButton>
-                {user.role === 'artist' && <TabButton>Analytics</TabButton>}
-                {user.role === 'admin' && <TabButton>Admin</TabButton>}
+                {user?.role === 'artist' && <TabButton>Analytics</TabButton>}
+                {user?.role === 'admin' && <TabButton>Admin</TabButton>}
               </div>
             </div>
 
