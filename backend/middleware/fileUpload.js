@@ -1,5 +1,5 @@
-import { upload } from "../config/multerConfig.js"; // Assuming default export, fix if it's named export
-import  cloudinary  from "../config/cloudinaryConfig.js"; // Ensure you're exporting v2 from config
+import { upload } from "../config/multerConfig.js";
+import  cloudinary  from "../config/cloudinaryConfig.js"; 
 import streamifier from "streamifier";
 
 /**

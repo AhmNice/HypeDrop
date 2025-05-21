@@ -151,8 +151,8 @@ export const deleteSnippet = async (req, res) => {
     // Extract public_id from Cloudinary URLs if you want to delete from Cloudinary
     const audioPublicId = snippet.audioPath?.split('/').pop().split('.')[0];
     const coverPhotoPublicId = snippet.coverPhotoPath?.split('/').pop().split('.')[0];
-    if (audioPublicId) await cloudinary.uploader.destroy(`audio/${audioPublicId}`, { resource_type: 'video' });
-    if (coverPhotoPublicId) await cloudinary.uploader.destroy(`coverPhotos/${coverPhotoPublicId}`, { resource_type: 'image' });
+    if (audioPublicId) await cloudinary.uploader.destroy(`HypeDrop/audio/${audioPublicId}`, { resource_type: 'video' });
+    if (coverPhotoPublicId) await cloudinary.uploader.destroy(`HypeDrop/coverPhotos/${coverPhotoPublicId}`, { resource_type: 'image' });
 
     await new Notification({
       user: req.userId,
