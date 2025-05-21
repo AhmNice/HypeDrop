@@ -76,7 +76,7 @@ const ArtistForm = () => {
         return () => clearTimeout(timer);
       }
     }, 500);
-  }, [success,navigate]);
+  }, [success, navigate]);
 
   useEffect(() => {
     if (error) {

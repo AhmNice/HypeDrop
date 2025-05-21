@@ -7,6 +7,7 @@ import { verifyUser } from '../middleware/verifyUser.js'
 import { updateStreams } from '../controller/stream.controller.js'
 import { trending } from '../utils/trendingSnippets.js'
 import { getUserNotifications, markNotificationAsRead } from '../controller/notification.controller.js'
+import { upload } from '../config/multerConfig.js'
 
 const router = express.Router()
 
@@ -21,7 +22,10 @@ router.post('/trending/me',verifyUserToken, checkAuth,trending)
 router.post('/get-snippet', getSnippet)
 router.post('/streams', verifyUserToken, checkAuth, updateStreams)
 router.post('/streams-guest',  updateStreams)
-router.post('/create-snippet', verifyUserToken, checkAuth, createSnippet )
+router.post('/create-snippet', verifyUserToken, checkAuth, upload.fields([
+    { name: 'audio', maxCount: 1 },
+    { name: 'coverPhoto', maxCount: 1 }
+  ]), createSnippet )
 router.post('/snippets/me', verifyUserToken, verifyUser, checkAuth,getArtistSnippet)
 router.post('/update-snippets/me', verifyUserToken, verifyUser, checkAuth,updateSnippet)
 router.post('/snippet/delete-snippet', verifyUserToken, verifyUser, checkAuth,deleteSnippet)

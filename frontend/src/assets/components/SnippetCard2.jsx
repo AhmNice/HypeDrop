@@ -86,7 +86,7 @@ const SnippetCard2 = ({ snippet, handleToShare,
         onClick={handleClick}
         className="relative">
         <img
-          src={`${API_BASE_URL}/${snippet.coverPhotoPath}`}
+          src={`${snippet.coverPhotoPath}`}
           alt={`Cover photo for ${snippet.title}`}
           className="w-full h-48 object-cover"
         />

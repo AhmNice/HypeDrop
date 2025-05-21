@@ -141,7 +141,7 @@ const UploadForm = () => {
       toast.error('An unexpected error occurred. Please try again');
     } finally {
       setIsSubmitting(false);
-      completed(true)
+      setCompleted(true)
     }
   };
 

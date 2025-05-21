@@ -1,10 +1,12 @@
+import { uploadToCloudinary } from "../middleware/fileUpload.js";
 import { Notification } from "../models/notification.model.js";
 import { Snippet } from "../models/snippet.model.js";
 import { User } from "../models/user.model.js";
-import { deleteFile } from "../utils/deleteFile.js";
+// import { deleteFile } from "../utils/deleteFile.js";
 import { handleFileAndCoverUpload } from "../utils/fileUploader.js";
 import path from 'path';
 import { fileURLToPath } from 'url'
+import cloudinary from "../config/cloudinaryConfig.js";
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -13,63 +15,73 @@ const uploadPath = path.join(__dirname, '..', 'uploads');
 const audioFolder = path.join(uploadPath, 'audio');
 const coverPhotoFolder = path.join(uploadPath, 'coverPhotos');
 
+
 export const createSnippet = async (req, res) => {
   try {
-    // Handle file uploads
-    const files = await handleFileAndCoverUpload(req, res);
+    // Multer puts files into req.files thanks to memoryStorage
+    const audioFile = req.files?.audio?.[0];
+    const coverPhotoFile = req.files?.coverPhoto?.[0];
 
-    // Extract file paths
-    const audioFile = files.audio ? files.audio[0] : null;
-    const coverPhotoFile = files.coverPhoto ? files.coverPhoto[0] : null;
-
-    if (!audioFile || !audioFile.path) {
-      return res.status(400).json({ message: "Audio file upload failed" });
+    if (!audioFile || !coverPhotoFile) {
+      return res.status(400).json({
+        message: !audioFile
+          ? "Audio file upload failed"
+          : "Cover photo upload failed"
+      });
     }
 
-    if (!coverPhotoFile || !coverPhotoFile.path) {
-      return res.status(400).json({ message: "Cover photo upload failed" });
-    }
+    // Upload audio to Cloudinary
+    const audioUploadResult = await uploadToCloudinary(audioFile.buffer, {
+      folder: 'HypeDrop/audio',
+      resource_type: 'video', // for audio files
+      public_id: path.parse(audioFile.originalname).name,
+    });
 
-    // Extract relative paths (starting from 'uploads/')
-    const audioPath = path.relative('backend', audioFile.path); // e.g., 'uploads/audio/example.mp3'
-    const coverPhotoPath = path.relative('backend', coverPhotoFile.path); // e.g., 'uploads/coverPhotos/example.jpg'
+    // Upload cover photo to Cloudinary
+    const coverPhotoUploadResult = await uploadToCloudinary(coverPhotoFile.buffer, {
+      folder: 'HypeDrop/coverPhotos',
+      resource_type: 'image',
+      public_id: path.parse(coverPhotoFile.originalname).name,
+    });
 
-    // Extract other fields from the request body
     const { title, artistName, releaseDate } = req.body;
+
     if (!title || !artistName || !releaseDate) {
       return res.status(400).json({ message: "All fields are required" });
     }
-    // Create a new snippet
+
+    // Save snippet to DB
     const newSnippet = new Snippet({
       title,
       artistName,
       releaseDate,
-      audioPath, // Save relative path
-      coverPhotoPath, // Save relative path
+      audioPath: audioUploadResult.secure_url,
+      coverPhotoPath: coverPhotoUploadResult.secure_url,
       owner: req.userId,
     });
-
 
     await Promise.all([
       newSnippet.save(),
       new Notification({
-        user:req.userId,
-        title:'Snippet upload',
-        message:'Your snippet has been uploaded successfully',
-        link:'/snippets',
-        type:'snippet'
-      }).save()
+        user: req.userId,
+        title: 'Snippet upload',
+        message: 'Your snippet has been uploaded successfully',
+        link: '/snippets',
+        type: 'snippet',
+      }).save(),
     ]);
 
     return res.status(201).json({
       message: "Snippet created successfully",
       snippet: newSnippet,
     });
+
   } catch (err) {
-    console.error("Error creating snippet:", err.message);
+    console.error("❌ Error creating snippet:", err);
     return res.status(500).json({ message: "Error creating snippet", error: err.message });
   }
 };
+
 
 export const getAllSnippets = async (req, res) => {
   try {
@@ -126,6 +138,8 @@ export const updateSnippet = async (req, res) => {
   }
 };
 
+
+
 export const deleteSnippet = async (req, res) => {
   const { id } = req.body;
   if (!id) return res.status(400).json({ message: "Snippet id is required" });
@@ -133,16 +147,20 @@ export const deleteSnippet = async (req, res) => {
   try {
     const snippet = await Snippet.findByIdAndDelete(id);
     if (!snippet) return res.status(404).json({ message: "Snippet not found" });
-    const snippetName = path.relative('audio', snippet.audioPath)
-    const snippetCoverPhoto = path.relative('coverPhotos', snippet.coverPhotoPath)
-    await deleteFile(audioFolder, snippetName)
-    await deleteFile(coverPhotoFolder, snippetCoverPhoto)
+
+    // Extract public_id from Cloudinary URLs if you want to delete from Cloudinary
+    const audioPublicId = snippet.audioPath?.split('/').pop().split('.')[0];
+    const coverPhotoPublicId = snippet.coverPhotoPath?.split('/').pop().split('.')[0];
+    if (audioPublicId) await cloudinary.uploader.destroy(`audio/${audioPublicId}`, { resource_type: 'video' });
+    if (coverPhotoPublicId) await cloudinary.uploader.destroy(`coverPhotos/${coverPhotoPublicId}`, { resource_type: 'image' });
+
     await new Notification({
-      user:req.userId,
-      title:'Deleted snippet',
-      message:`Your snippet ${snippet.title} has been deleted !`,
-      type:'delete'
-    }).save()
+      user: req.userId,
+      title: 'Deleted snippet',
+      message: `Your snippet ${snippet.title} has been deleted !`,
+      type: 'delete'
+    }).save();
+
     return res.status(200).json({ message: "Snippet deleted successfully" });
   } catch (error) {
     console.error("Error deleting snippet:", error.message);

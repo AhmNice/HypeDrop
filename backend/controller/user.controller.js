@@ -3,7 +3,7 @@ import { User } from '../models/user.model.js';
 import {  generateResetPasswordToken } from '../utils/generateResetPasswordToken.js';
 import {  generateVerificationCode } from '../utils/generateVerificationToken.js';
 import { generateTokenAndSetCookies } from '../utils/generateTokenAndSetCookies.js';
-import { sendUserWelcomeEmail, sendForgetPasswordEmail, sendPasswordResetSuccessEmail, sendVerificationEmail_user } from '../mailer/nodemailer/emails.js';
+import { sendUserWelcomeEmail, sendForgetPasswordEmail, sendPasswordResetSuccessEmail, sendVerificationEmail_user } from '../mailer/resend/emails.js';
 import { handleImageUpload } from '../utils/pictureUploader.js';
 import path from 'path'
 import { Notification } from '../models/notification.model.js';

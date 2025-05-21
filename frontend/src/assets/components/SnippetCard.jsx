@@ -46,7 +46,7 @@ export const SnippetCard = ({snippet,handlePreview, handleOverlay, handleToShare
       <img
     onClick={handleClick}
 
-        src={`${API_BASE_URL}/${snippet.coverPhotoPath}`}
+        src={`${snippet.coverPhotoPath}`}
         alt={`Cover photo for ${snippet.title}`}
         className="w-full h-40 object-cover"
       />

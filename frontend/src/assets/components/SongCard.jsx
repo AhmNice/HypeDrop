@@ -174,7 +174,7 @@ const SongCard = ({ snippet, handlePreview }) => {
 
         <div className="relative aspect-square w-full">
           <img
-            src={`${API_IMAGE_BASE_URL}/${snippet.coverPhotoPath}`}
+            src={`${snippet.coverPhotoPath}`}
             alt="Album cover"
             className="w-full h-full object-cover"
           />
@@ -229,7 +229,7 @@ const SongCard = ({ snippet, handlePreview }) => {
 
         <audio
           ref={audioRef}
-          src={`${API_IMAGE_BASE_URL}/${snippet.audioPath}`}
+          src={`${snippet.audioPath}`}
           preload="metadata"
         />
       </motion.div>

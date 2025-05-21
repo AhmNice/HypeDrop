@@ -54,7 +54,7 @@ const SnippetContainer = ({setTotalSnippets}) => {
     };
 
     fetchData();
-  }, [user, isAuthenticated]);
+  }, [user, isAuthenticated,]);
 
   const handleOverlay = () => {
     setOverlayIsOpen((prev) => !prev);
