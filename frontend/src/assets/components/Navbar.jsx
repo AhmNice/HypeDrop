@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { logout, isAuthenticated } = useAuthStore();
+  const {user, logout, isAuthenticated } = useAuthStore();
   const [isCollapsed, setIsCollapsed] = useState(true);
 
   const handleLogout = async () => {
@@ -54,12 +54,12 @@ const Navbar = () => {
             label="My Snippets"
             isCollapsed={isCollapsed}
           />
-          <NavItem
+          {user?.role === 'artist' && <NavItem
             to="/upload-snippet"
             icon={<FiUpload size={20} />}
             label="Add Snippet"
             isCollapsed={isCollapsed}
-          />
+          />}
           <NavItem
             to="/profile"
             icon={<FiUser size={20} />}
@@ -73,7 +73,7 @@ const Navbar = () => {
       <div className="p-4 border-t border-gray-100">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 text-gray-700 hover:text-[#7D00FF] transition-colors w-full"
+          className="flex cursor-pointer items-center gap-3 text-gray-700 hover:text-[#7D00FF] transition-colors w-full"
         >
           <FiLogOut size={20} />
           {!isCollapsed && <span className="InterRegular">Logout</span>}

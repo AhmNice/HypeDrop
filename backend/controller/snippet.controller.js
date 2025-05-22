@@ -138,8 +138,6 @@ export const updateSnippet = async (req, res) => {
   }
 };
 
-
-
 export const deleteSnippet = async (req, res) => {
   const { id } = req.body;
   if (!id) return res.status(400).json({ message: "Snippet id is required" });

@@ -64,12 +64,12 @@ const UserForm = () => {
   };
  useEffect(() => {
   console.log('Starting')
-  if (success) {
     const timer = setTimeout(() => {
-      navigate("/email-verification");
+      if(success){
+        navigate("/email-verification");
+      }
     }, 500);
     return () => clearTimeout(timer);
-  }
 }, [success, navigate]);
 
   useEffect(() => {

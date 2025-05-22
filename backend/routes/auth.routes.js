@@ -2,7 +2,7 @@ import express from 'express'
 import {  emailVerification, sendAuthenticatedAccount, updateProfile, updateProfilePicture, userForgotPassword, userLogin, userLogout, userRegistration, userResetPassword  } from '../controller/user.controller.js'
 import { verifyUserToken } from '../middleware/verifyToken.js'
 import { checkAuth } from '../middleware/checkAuth.js'
-import { createSnippet, deleteSnippet, getArtistSnippet, getSnippet, updateSnippet, updateSnippetLinks } from '../controller/snippet.controller.js'
+import { createSnippet, deleteSnippet, getAllSnippets, getArtistSnippet, getSnippet, updateSnippet, updateSnippetLinks } from '../controller/snippet.controller.js'
 import { verifyUser } from '../middleware/verifyUser.js'
 import { updateStreams } from '../controller/stream.controller.js'
 import { trending } from '../utils/trendingSnippets.js'
@@ -27,6 +27,7 @@ router.post('/create-snippet', verifyUserToken, checkAuth, upload.fields([
     { name: 'coverPhoto', maxCount: 1 }
   ]), createSnippet )
 router.post('/snippets/me', verifyUserToken, verifyUser, checkAuth,getArtistSnippet)
+router.get('/snippets/all-snippet',getAllSnippets)
 router.post('/update-snippets/me', verifyUserToken, verifyUser, checkAuth,updateSnippet)
 router.post('/snippet/delete-snippet', verifyUserToken, verifyUser, checkAuth,deleteSnippet)
 router.post('/snippet/update-link', verifyUserToken, verifyUser, checkAuth,updateSnippetLinks)
