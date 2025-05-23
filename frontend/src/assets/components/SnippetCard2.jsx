@@ -8,6 +8,7 @@ import { useAuthStore } from '../store/authStore';
 const SnippetCard2 = ({ snippet, handleToShare,
   handleOverlay, handlePreview, handleEdithLink, handleEdith, handlePreviewSong,handleDelete }) => {
   const API_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL
+  const {user} = useAuthStore()
   const [showOptions, setShowOption] = useState(false);
 
 
@@ -101,9 +102,9 @@ const SnippetCard2 = ({ snippet, handleToShare,
             <h3 className="font-bold text-lg text-gray-900">{snippet.title}</h3>
             <p className="InterRegular text-gray-500 InterRegular text-sm mt-1">{timeAgo(snippet.createdAt)} </p>
           </div>
-          <button onClick={() => setShowOption((prev) => !prev)} className="text-gray-400 hover:text-gray-600">
+          {user?.role === 'artist' && <button onClick={() => setShowOption((prev) => !prev)} className="text-gray-400 hover:text-gray-600">
             <FiMoreVertical />
-          </button>
+          </button>}
           {showOptions ? (<OptionDiv snippet={snippet} />) : ''}
         </div>
 
@@ -122,7 +123,7 @@ const SnippetCard2 = ({ snippet, handleToShare,
               handleToShare(snippet._id);
               handleOverlay()
             }}
-            className="bg-[#7D00FF] hover:bg-[#5b00cc] text-white rounded-full p-2 transition-colors">
+            className="bg-[#7D00FF] cursor-pointer hover:bg-[#5b00cc] text-white rounded-full p-2 transition-colors">
             <FiShare2 size={18} />
           </button>
         </div>

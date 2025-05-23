@@ -2,49 +2,50 @@ import { Snippet } from "../models/snippet.model.js";
 import { TrendingSnippets } from '../models/trendingSnippets.model.js';
 
 export const trending = async (req, res) => {
-  const  userId  = req.userId;
-  // console.log(req.userId)
-  if (!userId)
-    return res.status(400).json({ success: false, message: 'userId is required' });
-
   try {
-    const snippets = await Snippet.find({
-      owner: userId,
-      totalPlays: { $gte: 250 },
-    });
+    // Fetch all snippets (or filter later)
+    const allSnippets = await Snippet.find();
 
-    if (!snippets || snippets.length === 0) {
-      return res.status(200).json({ success: false, message: 'You have no trending snippets' });
+    // Filter snippets where totalPlays (as number) >= 250, then sort descending by totalPlays
+    const trendingSnippets = allSnippets
+      .filter(snippet => Number(snippet.totalPlays) >= 250)
+      .sort((a, b) => Number(b.totalPlays) - Number(a.totalPlays))
+      .slice(0, 10);
+
+    if (!trendingSnippets || trendingSnippets.length === 0) {
+      return res.status(200).json({
+        success: false,
+        message: "No trending snippets found",
+        results: [],
+      });
     }
-
-    // Sort snippets by totalPlays descending
-    snippets.sort((a, b) => b.totalPlays - a.totalPlays);
 
     const results = [];
 
-    for (let i = 0; i < snippets.length; i++) {
-      const snippet = snippets[i];
+    for (let i = 0; i < trendingSnippets.length; i++) {
+      const snippet = trendingSnippets[i];
       const newPosition = i + 1;
 
       let existing = await TrendingSnippets.findOne({ snippetId: snippet._id });
 
       if (!existing) {
-        const newRecord = new TrendingSnippets({
+        const newTrend = new TrendingSnippets({
           snippetId: snippet._id,
-          title:snippet.title,
+          title: snippet.title,
           owner: snippet.owner,
           position: newPosition,
+          prevPosition: newPosition,
           audioPath: snippet.audioPath,
           coverPhotoPath: snippet.coverPhotoPath,
-          prevPosition: newPosition,
-          totalPlays: snippet.totalPlays,
+          totalPlays: Number(snippet.totalPlays), // convert to number here
           trend: 'new',
-          totalPlays:snippet.totalPlays
         });
-        await newRecord.save();
-        results.push(newRecord);
+
+        await newTrend.save();
+        results.push(newTrend);
       } else {
         const prevPosition = existing.position || newPosition;
+
         const positionChange =
           prevPosition > newPosition ? 'up' :
           newPosition > prevPosition ? 'down' :
@@ -52,26 +53,35 @@ export const trending = async (req, res) => {
 
         existing.prevPosition = prevPosition;
         existing.position = newPosition;
-        existing.totalPlays = snippet.totalPlays;
         existing.trend = positionChange;
-        existing.title=snippet.title,
-        existing.totalPlays = snippet.totalPlays
-        existing.audioPath=snippet.audioPath,
-        existing.coverPhotoPath=snippet.coverPhotoPath,
+
+        existing.title = snippet.title;
+        existing.owner = snippet.owner;
+        existing.audioPath = snippet.audioPath;
+        existing.coverPhotoPath = snippet.coverPhotoPath;
+        existing.totalPlays = Number(snippet.totalPlays); // convert here
 
         await existing.save();
         results.push(existing);
       }
     }
 
+    // Convert totalPlays to number before sending response
+    const responseResults = results.map(trend => ({
+      ...trend.toObject(),
+      totalPlays: Number(trend.totalPlays),
+      position: Number(trend.position),
+      prevPosition: Number(trend.prevPosition),
+    }));
+
     return res.status(200).json({
       success: true,
-      message: 'Here are all your trending snippets',
-      results,
+      message: 'Here are the trending snippets with movement tracking',
+      results: responseResults,
     });
 
   } catch (error) {
-    console.error(error);
+    console.error("Trending error:", error);
     return res.status(500).json({
       success: false,
       message: 'Could not fetch trending snippets',

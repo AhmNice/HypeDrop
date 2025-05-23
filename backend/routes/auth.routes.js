@@ -8,6 +8,7 @@ import { updateStreams } from '../controller/stream.controller.js'
 import { trending } from '../utils/trendingSnippets.js'
 import { getUserNotifications, markNotificationAsRead } from '../controller/notification.controller.js'
 import { upload } from '../config/multerConfig.js'
+import { profilePictureUpload } from '../middleware/profileUploader.js'
 
 const router = express.Router()
 
@@ -18,7 +19,7 @@ router.post('/forget-password',userForgotPassword)
 router.post('/reset-password', userResetPassword);
 router.post('/logout', userLogout)
 router.get('/authenticatedAccount',verifyUserToken,checkAuth,sendAuthenticatedAccount)
-router.post('/trending/me',verifyUserToken, checkAuth,trending)
+router.get('/trending',verifyUserToken,trending)
 router.post('/get-snippet', getSnippet)
 router.post('/streams', verifyUserToken, checkAuth, updateStreams)
 router.post('/streams-guest',  updateStreams)
@@ -31,8 +32,8 @@ router.get('/snippets/all-snippet',getAllSnippets)
 router.post('/update-snippets/me', verifyUserToken, verifyUser, checkAuth,updateSnippet)
 router.post('/snippet/delete-snippet', verifyUserToken, verifyUser, checkAuth,deleteSnippet)
 router.post('/snippet/update-link', verifyUserToken, verifyUser, checkAuth,updateSnippetLinks)
-router.post('/me/update-profilePicture', verifyUserToken, updateProfilePicture)
-router.post('/me/update-profile', verifyUserToken, updateProfile)
+router.post('/me/update-profilePicture', verifyUserToken, upload.single('profilePicture'), profilePictureUpload)
+router.post('/me/update-profile', verifyUserToken,  updateProfile)
 router.post('/me/get-notification', verifyUserToken, getUserNotifications)
 router.post('/me/read-notification', verifyUserToken, markNotificationAsRead)
 export default router

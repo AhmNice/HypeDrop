@@ -6,9 +6,8 @@ import { IoMdTrendingUp, IoMdTrendingDown } from 'react-icons/io';
 import { MdTrendingFlat } from 'react-icons/md';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
-import { Loader, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import Pagination from './Pagination';
-
 
 const TrendingSongs = () => {
   const { user, isAuthenticated } = useAuthStore();
@@ -18,20 +17,18 @@ const TrendingSongs = () => {
   const [expandedSong, setExpandedSong] = useState(null);
   const [trendingSongs, setTrendingSongs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState(null);
-  const [audioToPlay, setAudioToPlay] = useState()
-  const [toDisplay, setToDisplay] = useState([])
-  const [totalPages, setTotalPage] = useState()
+  const [audioToPlay, setAudioToPlay] = useState();
+  const [toDisplay, setToDisplay] = useState([]);
+  const [totalPages, setTotalPage] = useState();
   const [currentPage, setCurrentPage] = useState(1);
-  const audioRef = useRef()
+  const audioRef = useRef();
 
-  // Toggle expanded view for song card
   const toggleExpand = (id) => {
     setExpandedSong(expandedSong === id ? null : id);
   };
 
-  // Format large numbers for display
   const formatNumber = (num) => {
     if (!num) return '0';
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
@@ -39,99 +36,96 @@ const TrendingSongs = () => {
     return num;
   };
 
-  // Get trend color based on trend direction
   const getTrendColor = (trend) => {
     switch (trend) {
       case 'up': return 'text-green-500';
       case 'down': return 'text-red-500';
+      case 'new': return 'text-orange-500';
       default: return 'text-yellow-500';
     }
   };
 
-  // Get trend icon component
   const getTrendIcon = (trend) => {
     switch (trend) {
-      case 'up': return <IoMdTrendingUp className="inline" />;
-      case 'down': return <IoMdTrendingDown className="inline" />;
-      default: return <MdTrendingFlat className="inline" />;
+      case 'up': return <IoMdTrendingUp className="inline mr-1" />;
+      case 'down': return <IoMdTrendingDown className="inline mr-1" />;
+      case 'new': return <FaFire className="inline mr-1" />;
+      default: return <MdTrendingFlat className="inline mr-1" />;
     }
   };
 
-  // Calculate trend based on play count changes
-  const calculateTrend = (currentPlays, previousPlays) => {
-    if (!previousPlays) return 'steady';
-    const change = ((currentPlays - previousPlays) / previousPlays) * 100;
-    if (change > 10) return 'up';
-    if (change < -5) return 'down';
-    return 'steady';
-  };
+  const fetchTrendingSongs = async () => {
+    setIsLoading(true);
+    setError(null);
 
+    try {
+      const res = await fetch(`${API_BASE_URL}/trending`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' }
+      });
 
-  // Fetch trending songs data
-  useEffect(() => {
-    const fetchTrendingSongs = async () => {
-      setIsLoading(true);
-      setError(null);
+      if (!res.ok) throw new Error('Failed to fetch trending songs');
 
-      try {
-        const res = await fetch(`${API_BASE_URL}/trending/me`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' }
-        });
+      const data = await res.json();
 
-        if (!res.ok) throw new Error('Failed to fetch trending songs');
+      const songsWithTrend = data?.results?.map((song, index) => {
+        const isNew = song.previousPosition === null || song.previousPosition === undefined;
+        let trend = 'steady';
+        let rankChange = 0;
 
-        const data = await res.json();
+        if (isNew) {
+          trend = 'new';
+          rankChange = null;
+        } else if (song.previousPosition > song.position) {
+          trend = 'up';
+          rankChange = song.previousPosition - song.position;
+        } else if (song.previousPosition < song.position) {
+          trend = 'down';
+          rankChange = song.position - song.previousPosition;
+        } else {
+          trend = 'steady';
+          rankChange = 0;
+        }
 
-        // Add trend analysis to each song
-        const songsWithTrend = data?.results?.map((song, index) => ({
+        return {
           ...song,
           position: index + 1,
-          trend: calculateTrend(song.position, song.previousPosition)
-        }));
+          trend,
+          rankChange
+        };
+      });
 
-        setTrendingSongs(songsWithTrend);
-      } catch (err) {
-        setError(err.message);
-        toast.error(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      setTrendingSongs(songsWithTrend);
+    } catch (err) {
+      setError(err.message);
+      toast.error(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    if (isAuthenticated) fetchTrendingSongs();
-  }, [isAuthenticated, API_BASE_URL]);
   useEffect(() => {
-    // console.log(currentPage);
-    setTotalPage(Math.ceil(trendingSongs?.length / 10));
+    if (isAuthenticated) fetchTrendingSongs();
+  }, [isAuthenticated]);
 
+  useEffect(() => {
+    setTotalPage(Math.ceil(trendingSongs?.length / 10));
     const startIndex = (currentPage - 1) * 10;
     const endIndex = currentPage * 10;
     const data = trendingSongs?.slice(startIndex, endIndex);
     setToDisplay(data);
   }, [currentPage, trendingSongs]);
-  // Handle play song
+
   const handlePlay = (songId) => {
     const songToPlay = trendingSongs.find((song) => song._id === songId);
-
-    if (!songToPlay) {
-      toast.error('Song not found');
-      return;
-    }
-
-    if (!songToPlay.audioPath) {
-      toast.error('Audio file not available for this song');
+    if (!songToPlay || !songToPlay.audioPath) {
+      toast.error('Audio not available');
       return;
     }
 
     const audioUrl = `${SERVER}/${songToPlay.audioPath}`;
-    // console.log('Audio URL:', audioUrl);
-
-    if (!audioRef.current) {
-      toast.error('Audio player is not ready');
-      return;
-    }
+    if (!audioRef.current) return;
 
     if (audioToPlay === songToPlay.audioPath && isPlaying) {
       audioRef.current.pause();
@@ -141,31 +135,33 @@ const TrendingSongs = () => {
       setIsPlaying(true);
       setTimeout(() => {
         audioRef.current.play();
-      }, 0); // Ensure the `src` is updated before playing
+      }, 0);
     }
   };
 
-  // Handle like song
   const handleLike = async (songId) => {
     try {
-      // Implement like functionality
       toast.success(`Liked song ${songId}`);
-    } catch (err) {
+    } catch {
       toast.error('Failed to like song');
     }
   };
 
-  if (isLoading) return (
-    <div className="flex justify-center items-center h-40">
-      <Loader2 size={24} className='animate-spin' />
-    </div>
-  );
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-40">
+        <Loader2 size={24} className='animate-spin' />
+      </div>
+    );
+  }
 
-  if (error) return (
-    <div className="text-center py-6 text-red-500">
-      Error loading trending songs: {error}
-    </div>
-  );
+  if (error) {
+    return (
+      <div className="text-center py-6 text-red-500">
+        Error loading trending songs: {error}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 trendingPage">
@@ -185,8 +181,7 @@ const TrendingSongs = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
-            className={`bg-white rounded-lg overflow-hidden shadow-xs ${expandedSong === song._id ? 'shadow-md' : 'hover:shadow-sm'
-              } transition-all`}
+            className={`bg-white rounded-lg overflow-hidden shadow-xs ${expandedSong === song._id ? 'shadow-md' : 'hover:shadow-sm'} transition-all`}
           >
             <div className="p-3 flex items-center">
               <div className="relative flex-shrink-0 mr-3">
@@ -194,11 +189,11 @@ const TrendingSongs = () => {
                   {index + 1}
                 </div>
                 <img
-                  src={`${API_IMAGE_URL}/${song?.coverPhotoPath}`}
+                  src={`${song?.coverPhotoPath}`}
                   alt={`${song.title} cover`}
                   className="h-12 w-12 rounded-md object-cover bg-gray-100"
                   onError={(e) => {
-                    e.target.src = 'https://via.placeholder.com/150';
+                    // e.target.src = 'https://via.placeholder.com/150';
                     e.target.className = 'h-12 w-12 rounded-md object-cover bg-gray-200';
                   }}
                 />
@@ -208,9 +203,7 @@ const TrendingSongs = () => {
                 <h4 className="text-sm font-medium InterRegular text-gray-900 truncate">
                   {song.title || 'Untitled Song'}
                 </h4>
-                {/* <p className="text-xs text-gray-500 truncate">
-                  {song.artistName || 'Unknown Artist'}
-                </p> */}
+
                 <div className="flex items-center mt-1">
                   <span className="text-xs text-gray-500 flex items-center mr-3">
                     <FiPlay className="mr-1" size={12} />
@@ -221,7 +214,14 @@ const TrendingSongs = () => {
                     {formatNumber(song.likes)}
                   </span>
                   <span className={`text-xs ml-3 ${getTrendColor(song.trend)} flex items-center`}>
-                    {getTrendIcon(song.trend)} Trending
+                    {getTrendIcon(song.trend)}
+                    {song.trend === 'new'
+                      ? 'New'
+                      : song.rankChange > 0
+                        ? `+${song.rankChange}`
+                        : song.rankChange < 0
+                          ? `-${Math.abs(song.rankChange)}`
+                          : '0'}
                   </span>
                 </div>
               </div>
@@ -251,16 +251,20 @@ const TrendingSongs = () => {
                       <>
                         <FiPause className="mr-1" size={14} /> Pause
                       </>
-
-                    ) : <>
-                      <FiPlay className='mr-1' size={14} /> Play</>}
+                    ) : (
+                      <>
+                        <FiPlay className='mr-1' size={14} /> Play
+                      </>
+                    )}
                   </button>
-                  {user.role === 'artist' ? '' : <button
-                    onClick={() => handleLike(song._id)}
-                    className="flex items-center justify-center py-2 bg-white rounded-md border border-gray-200 hover:bg-gray-50 transition-colors"
-                  >
-                    <FiHeart className="mr-1" size={14} /> Like
-                  </button>}
+                  {user.role === 'artist' ? null : (
+                    <button
+                      onClick={() => handleLike(song._id)}
+                      className="flex items-center justify-center py-2 bg-white rounded-md border border-gray-200 hover:bg-gray-50 transition-colors"
+                    >
+                      <FiHeart className="mr-1" size={14} /> Like
+                    </button>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -271,7 +275,8 @@ const TrendingSongs = () => {
       <div className="text-center pt-2">
         <Pagination currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages} />
       </div>
-      <audio src={audioToPlay ? `${SERVER}/${audioToPlay} ` : ''} ref={audioRef}></audio>
+
+      <audio src={audioToPlay ? `${SERVER}/${audioToPlay}` : ''} ref={audioRef}></audio>
     </div>
   );
 };

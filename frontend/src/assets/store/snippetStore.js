@@ -11,6 +11,7 @@ const initialState = {
   singleSnippet: null,
   mySnippets:null,
   error: null,
+  trendingSnippets: null,
 };
 
 const BASE_API_URL = import.meta.env.VITE_API_BASE_URL;
@@ -84,6 +85,30 @@ export const useSnippets = create((set) => ({
     } catch (error) {
       set({
         error: error.response?.data?.message || error.message || 'error fetching snippets',
+        isLoading:false,
+        success:false
+      })
+    }
+  },
+  fetchTrendingSnippets: async()=>{
+    const BASE_URL = `${BASE_API_URL}/trending`
+    set({
+      success:false,
+      isLoading:true,
+      error:null,
+      trendingSnippets:null
+    })
+    try {
+        const {data} = await axios.get(BASE_URL)
+        set({
+          success:true,
+          isLoading:false,
+          trendingSnippets:data.results,
+          error:null
+        })
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || 'Failed to fetch trending songs',
         isLoading:false,
         success:false
       })

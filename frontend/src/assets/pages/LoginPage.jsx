@@ -16,8 +16,8 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [isVisible, setIsVisible] = useState(false);
   const [isFocused, setIsFocused] = useState({ email: false, password: false });
-  
-  const { login, error, isLoading, isCheckingAuth, isAuthenticated, success } = useAuthStore();
+
+  const { login, error, isLoading, resetAuthState, isCheckingAuth, isAuthenticated, success } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -72,6 +72,9 @@ const LoginPage = () => {
       toast.error(error);
     }
   }, [error]);
+  useEffect(()=>{
+    resetAuthState()
+  },[])
 
   if (isCheckingAuth) {
     return (

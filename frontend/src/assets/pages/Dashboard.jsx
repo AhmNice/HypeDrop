@@ -1,30 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { useAuthStore } from '../store/authStore';
-import Navbar from '../components/Navbar';
-import Header from '../components/Header';
-import Card from '../components/Card';
-import RecentActivity from '../components/RecentActivity';
-import TrendingSongs from '../components/TrendingSongs';
-import { FiTrendingUp, FiMusic, FiHeart, FiShare2 } from 'react-icons/fi';
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { useAuthStore } from "../store/authStore";
+import Navbar from "../components/Navbar";
+import Header from "../components/Header";
+import Card from "../components/Card";
+import RecentActivity from "../components/RecentActivity";
+import TrendingSongs from "../components/TrendingSongs";
+import { FiTrendingUp, FiMusic, FiHeart, FiShare2 } from "react-icons/fi";
 
 const Dashboard = () => {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const { user, isAuthenticated } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
-   useEffect(() => {
-      document.title = "Dashboard | HypeDrop";
-    }, []);
+  useEffect(() => {
+    document.title = "Dashboard | HypeDrop";
+  }, []);
   const [stats, setStats] = useState({
     plays: 0,
     likes: 0,
     shares: 0,
-    followers: 0
+    followers: 0,
   });
   const formatNumber = (num) => {
-    if (!num) return '0';
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    if (!num) return "0";
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+    if (num >= 1000) return (num / 1000).toFixed(1) + "K";
     return num;
   };
   // Simulate data loading
@@ -38,33 +38,44 @@ const Dashboard = () => {
 
         try {
           const res = await fetch(`${API_BASE_URL}/snippets/me`, {
-            method: 'POST',
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
             body: JSON.stringify(payload),
-            credentials: 'include',
+            credentials: "include",
           });
 
           if (res.ok) {
             const data = await res.json();
             const results = data.results;
             const plays = formatNumber(
-              results.reduce((sum, result) => sum + (parseInt(result.totalPlays, 10) || 0), 0)
+              results.reduce(
+                (sum, result) => sum + (parseInt(result.totalPlays, 10) || 0),
+                0
+              )
             );
 
             const likes = formatNumber(
-              results.reduce((sum, result) => sum + (parseInt(result.likes, 10) || 0), 0)
-            )
+              results.reduce(
+                (sum, result) => sum + (parseInt(result.likes, 10) || 0),
+                0
+              )
+            );
 
             const shares = formatNumber(
-              results.reduce((sum, result) => sum + (parseInt(result.shares, 10) || 0), 0)
+              results.reduce(
+                (sum, result) => sum + (parseInt(result.shares, 10) || 0),
+                0
+              )
             );
 
             const followers = formatNumber(
-              results.reduce((sum, result) => sum + (parseInt(result.followers, 10) || 0), 0)
+              results.reduce(
+                (sum, result) => sum + (parseInt(result.followers, 10) || 0),
+                0
+              )
             );
-
 
             setStats({
               plays,
@@ -73,9 +84,8 @@ const Dashboard = () => {
               followers,
             });
           } else {
-            toast.error('Error fetching snippets');
+            toast.error("Error fetching snippets");
           }
-
         } catch (error) {
           toast.error(error.message);
         } finally {
@@ -87,16 +97,15 @@ const Dashboard = () => {
     fetchData();
   }, [user, isAuthenticated]);
 
-
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   const itemVariants = {
@@ -105,18 +114,20 @@ const Dashboard = () => {
       y: 0,
       opacity: 1,
       transition: {
-        type: 'spring',
-        stiffness: 100
-      }
-    }
+        type: "spring",
+        stiffness: 100,
+      },
+    },
   };
 
   return (
-    <div style={{ gridTemplateColumns: '20%  80%' }} className="flex h-screen bg-gray-50 overflow-hidden">
+    <div
+      style={{ gridTemplateColumns: "20%  80%" }}
+      className="flex h-screen bg-gray-50 overflow-hidden"
+    >
       {/* Sidebar */}
 
-        <Navbar />
-
+      <Navbar />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -131,8 +142,12 @@ const Dashboard = () => {
             transition={{ duration: 0.5 }}
             className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 mb-6 text-white"
           >
-            <h1 className="text-2xl font-bold capitalize">Welcome back, {user?.stageName || user?.userName}!</h1>
-            <p className="opacity-90">Here's what's happening with your music today</p>
+            <h1 className="text-2xl font-bold capitalize">
+              Welcome back, {user?.stageName || user?.userName}!
+            </h1>
+            <p className="opacity-90">
+              Here's what's happening with your music today
+            </p>
           </motion.div>
 
           {/* Stats Cards */}

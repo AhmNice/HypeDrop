@@ -136,7 +136,7 @@ const Header = () => {
           </div>
           <div className='rounded-full w-9 h-9 bg-gray-200 overflow-hidden flex items-center justify-center'>
             <img
-             src={user?.profilePicture ? `${IMAGE_BASE_URL}/${user?.profilePicture}` : '/preview-user.png'}
+             src={user?.profilePicture ? `${user?.profilePicture}` : '/preview-user.png'}
               alt="Profile"
               className='w-full h-full object-cover'
             />

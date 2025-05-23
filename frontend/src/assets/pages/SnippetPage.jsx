@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  FiSearch,
-  FiFilter,
-} from "react-icons/fi";
+import { FiSearch, FiFilter } from "react-icons/fi";
 import { Loader2 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
@@ -13,6 +10,7 @@ import toast from "react-hot-toast";
 import ShareOverlay from "../components/ShareOverlay";
 import EdithForm from "../components/EdithForm";
 import AudioLinksEditor from "../components/AudioLinksEditor";
+import { useSnippets } from "../store/snippetStore";
 
 const SnippetsPage = () => {
   const CLIENT_BASE_URL = import.meta.env.VITE_CLIENT_BASE_URL;
@@ -22,7 +20,6 @@ const SnippetsPage = () => {
   const [openModel, setOpenModel] = useState(false);
   const [toEdith, setToEdith] = useState();
   const [snippets, setSnippets] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [toShare, setToShare] = useState("");
   const [isPreviewing, setIsPreViewing] = useState(false);
   const [playSnippet, setPlaySnippet] = useState(null);
@@ -47,21 +44,31 @@ const SnippetsPage = () => {
     setPlaySnippet(snippet);
     handlePreview();
   };
-
+  const {
+    allSnippets,
+    mySnippets,
+    isLoading,
+    error,
+    success,
+    fetchArtistSnippets,
+    fetchAllSnippets,
+  } = useSnippets();
   const handleEdith = (id) => {
     setToEdith(id);
     handleModel();
   };
-
+  useEffect(() => {
+    document.title = "Snippets | HypeDrop";
+  }, []);
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this snippet?")) return;
 
     try {
       setIsDeleting(true);
       const res = await fetch(`${API_BASE_URL}/snippet/delete-snippet`, {
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        method: "POST",
         body: JSON.stringify({ id }),
       });
 
@@ -84,34 +91,33 @@ const SnippetsPage = () => {
     setLinkToEdit(id);
   };
 
-  const fetchData = async () => {
-    if (isAuthenticated && user) {
-      setLoading(true);
-      try {
-        const res = await fetch(`${API_BASE_URL}/snippets/me`, {
-          headers: { "Content-Type": "application/json" },
-          method: "POST",
-          body: JSON.stringify({ id: user._id }),
-          credentials: "include",
-        });
+  useEffect(() => {
+    const fetchSnippets = async () => {
+      if (!user) return;
 
-        if (res.ok) {
-          const data = await res.json();
-          setSnippets(data.results);
-        } else {
-          toast.error("Error fetching snippets");
+      try {
+        if (user.role === "artist") {
+          await fetchArtistSnippets({ id: user._id });
+        } else if (user.role === "user") {
+          await fetchAllSnippets();
         }
-      } catch (error) {
-        toast.error(error.message);
-      } finally {
-        setLoading(false);
+      } catch (err) {
+        toast.error(err?.message || "Failed to fetch snippets");
       }
+    };
+
+    if (isAuthenticated && user) {
+      fetchSnippets();
     }
-  };
+  }, [user, isAuthenticated]);
 
   useEffect(() => {
-    fetchData();
-  }, [user, isAuthenticated]);
+    if (user?.role === "artist") {
+      setSnippets(mySnippets || []);
+    } else if (user?.role === "user") {
+      setSnippets(allSnippets || []);
+    }
+  }, [mySnippets, allSnippets, user]);
 
   useEffect(() => {
     if (linkToEdit) {
@@ -220,7 +226,7 @@ const SnippetsPage = () => {
             </div>
 
             {/* Loading */}
-            {loading && (
+            {isLoading && (
               <div className="flex justify-center items-center h-60 w-full">
                 <Loader2 size={36} className="animate-spin text-[#7D00FF]" />
               </div>
@@ -250,15 +256,12 @@ const SnippetsPage = () => {
               )}
 
               {isPreviewing && (
-                <SongCard
-                  handlePreview={handlePreview}
-                  snippet={playSnippet}
-                />
+                <SongCard handlePreview={handlePreview} snippet={playSnippet} />
               )}
             </div>
 
             {/* Empty State */}
-            {filteredSnippets.length === 0 && !loading && (
+            {filteredSnippets.length === 0 && !isLoading && (
               <div className="text-center py-12">
                 <h3 className="text-xl font-medium text-gray-700 mb-2">
                   No snippets found

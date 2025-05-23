@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { X, Loader2, Image, Upload } from 'lucide-react';
 import toast from 'react-hot-toast';
+  import axios from 'axios';
 
 const ProfilePicForm = ({ handlePicUpdateVisible, userId }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -76,38 +77,47 @@ const ProfilePicForm = ({ handlePicUpdateVisible, userId }) => {
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError(null)
-    if (!formData.profilePicture) {
-      setError('Please select an image');
-      return;
-    }
 
-    setIsSubmitting(true);
-    const payload = new FormData();
-    payload.append('name', formData.fileName);
-    payload.append('image',formData.profilePicture);
-    payload.append('id', userId);
-    try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/me/update-profilePicture`,{
-          method:'POST',
-          body:payload,
-          credentials:'include',
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError(null);
 
-        });
-        const data = await res.json()
-        if(res.ok){
-          toast.success('Profile picture updated successfully')
-          handlePicUpdateVisible()
-        }
-    } catch (err) {
-      setError(err.message);
-      console.log(err, err.message)
-    } finally {
-      setIsSubmitting(false);
+  if (!formData.profilePicture) {
+    setError('Please select an image');
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  const payload = new FormData();
+  payload.append('profilePicture', formData.profilePicture); // Backend expects 'file' (upload.single('file'))
+
+  try {
+    const res = await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL}/me/update-profilePicture`,
+      payload,
+      {
+        withCredentials: true, // ensures cookies are sent
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+
+    if (res.data?.success) {
+      toast.success('Profile picture updated successfully');
+      handlePicUpdateVisible();
+    } else {
+      setError(res.data.message || 'Something went wrong');
     }
-  };
+  } catch (err) {
+    setError(err.response?.data?.message || err.message);
+    console.error(err);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   const triggerFileInput = () => {
     fileInputRef.current.click();
