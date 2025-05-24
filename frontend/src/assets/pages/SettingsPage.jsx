@@ -19,7 +19,7 @@ import ChangePasswordForm from "../components/ChangePasswordForm";
 import toast from "react-hot-toast";
 
 const SettingsPage = () => {
-  const { user } = useAuthStore();
+  const { user,resetAuthState } = useAuthStore();
   const [activeSection, setActiveSection] = useState("account");
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -30,6 +30,9 @@ const SettingsPage = () => {
   useEffect(() => {
     document.title = "Settings | HypeDrop";
   }, []);
+  useEffect(()=>{
+    resetAuthState()
+  },[])
   const { success, error, isLoading, updateDisplayname_email } = useAuthStore();
   const handleChange = (e)=>{
     const {id, value} = e.target
