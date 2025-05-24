@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { User } from '../models/user.model.js';
-import {  generateResetPasswordToken } from '../utils/generateResetPasswordToken.js';
-import {  generateVerificationCode } from '../utils/generateVerificationToken.js';
+import { generateResetPasswordToken } from '../utils/generateResetPasswordToken.js';
+import { generateVerificationCode } from '../utils/generateVerificationToken.js';
 import { generateTokenAndSetCookies } from '../utils/generateTokenAndSetCookies.js';
 import { sendUserWelcomeEmail, sendForgetPasswordEmail, sendPasswordResetSuccessEmail, sendVerificationEmail_user } from '../mailer/nodemailer/emails.js';
 import { handleImageUpload } from '../utils/pictureUploader.js';
@@ -207,7 +207,7 @@ export const userResetPassword = async (req, res) => {
     res.status(500).json({ success: false, message: 'Could not reset password' });
   }
 };
-export const userLogout = async (req, res)=>{
+export const userLogout = async (req, res) => {
   try {
     res.clearCookie('userSession', {
       path: '/',
@@ -243,22 +243,22 @@ export const sendAuthenticatedAccount = async (req, res) => {
     res.status(500).json({ success: false, message: 'Could not send authenticated account' });
   }
 };
-export const updateProfilePicture = async (req, res)=>{
+export const updateProfilePicture = async (req, res) => {
   try {
     const file = await handleImageUpload(req, res);
     const { id } = req.body
-  if(!file){
-    return res.status(400).json({message:'No file selected'})
-  }
-  const relativePath = path.relative('backend', file.path)
-  const isUser = await User.findOne({_id:id})
-  if(!isUser) return res.status(400).json({success:false, message:'Invalid user'})
-  isUser.profilePicture = relativePath
-  await isUser.save()
-  res.status(200).json({
-    success:true,
-    message:'Profile picture updated successfully'
-  })
+    if (!file) {
+      return res.status(400).json({ message: 'No file selected' })
+    }
+    const relativePath = path.relative('backend', file.path)
+    const isUser = await User.findOne({ _id: id })
+    if (!isUser) return res.status(400).json({ success: false, message: 'Invalid user' })
+    isUser.profilePicture = relativePath
+    await isUser.save()
+    res.status(200).json({
+      success: true,
+      message: 'Profile picture updated successfully'
+    })
   } catch (err) {
     console.error('Error uploading file:', err.message);
     return res.status(500).json({ message: err.message });
@@ -304,4 +304,86 @@ export const updateProfile = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Could not update your profile' });
   }
 };
+export const updatePassword = async (req, res) => {
+  const { currentPassword, newPassword, userId } = req.body;
 
+  if (!currentPassword || !newPassword || !userId) {
+    return res.status(400).json({
+      success: false,
+      message: 'All fields are required',
+    });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: 'Current password is incorrect',
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Password changed successfully!',
+    });
+  } catch (error) {
+    console.error('Error occurred while trying to change password:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+};
+export const updateDisplayNameOrEmail = async (req, res) => {
+  const { userId, email, displayName } = req.body
+  if (!email && !displayName) {
+    return res.status(400).json({
+      success: false,
+      message: 'No field to update'
+    });
+  }
+  if (!userId) {
+    return res.status(400).json({
+      success: false,
+      message: 'user id is required'
+    });
+  }
+  try {
+    const user = await User.findById(userId);
+    if(!user){
+      return res.status(400).json({
+        success:false,
+        message:'User not found'
+      })
+    }
+    if(displayName) {user.displayName = displayName}
+    if(email) {user.email = email}
+    user.updatedAt = Date.now()
+    await user.save()
+
+    res.status(200).json({
+      success:true,
+      message:'Updated successfully'
+    })
+  } catch (error) {
+    console.log('Error occurred while trying to update fields')
+    res.status(500).json({
+      success:false,
+      message:'Internal server error'
+    });
+  }
+}

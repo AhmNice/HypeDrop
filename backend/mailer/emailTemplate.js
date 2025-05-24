@@ -152,3 +152,32 @@ export const SNIPPET_NOTIFICATION_EMAIL_TEMPLATE = `
 </body>
 </html>
 `;
+export const SONG_RELEASE_REMINDER_TEMPLATE = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Song Is Live — Add a Link for Your Fans!</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <div style="background: linear-gradient(to right, #7D00FF, #BB00FF); padding: 20px; text-align: center;">
+    <h1 style="color: white; margin: 0;">Your Track Is Out!</h1>
+  </div>
+  <div style="background-color: #f9f9f9; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    <p>Hey {artistName},</p>
+    <p>Awesome news! Your track "<strong>{songTitle}</strong>" has officially dropped.</p>
+    <p>To keep the momentum going and make sure fans can listen instantly, please update or add a link to the full song. This will appear when fans revisit your snippet page.</p>
+    <p>It only takes a few seconds and ensures your audience has direct access to your music.</p>
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="{updateSongLinkURL}" style="background-color: #7D00FF; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Update Song Link</a>
+    </div>
+    <p>Let your snippet lead to streams, follows, and shares!</p>
+    <p>Keep dropping heat,<br>The HypeDrop Team</p>
+  </div>
+  <div style="text-align: center; margin-top: 20px; color: #888; font-size: 0.8em;">
+    <p>This is an automated message from HypeDrop. No need to reply.</p>
+  </div>
+</body>
+</html>
+`;

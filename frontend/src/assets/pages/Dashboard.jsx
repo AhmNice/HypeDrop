@@ -143,7 +143,7 @@ const Dashboard = () => {
             className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 mb-6 text-white"
           >
             <h1 className="text-2xl font-bold capitalize">
-              Welcome back, {user?.stageName || user?.userName}!
+              Welcome back, { user?.displayName ||   user?.stageName || user?.userName }!
             </h1>
             <p className="opacity-90">
               Here's what's happening with your music today

@@ -21,7 +21,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
-
+  displayName:{
+    type:String,
+    default:''
+  },
   // Auth & verification
   resetPasswordToken: String,
   resetPasswordExpiresAt: Date,

@@ -1,3 +1,4 @@
+import { SONG_RELEASE_REMINDER_TEMPLATE } from '../emailTemplate.js'
 import { USER_PASSWORD_RESET_REQUEST_TEMPLATE, USER_PASSWORD_RESET_SUCCESS_TEMPLATE, USER_VERIFICATION_EMAIL_TEMPLATE, USER_WELCOME_EMAIL_TEMPLATE } from '../userEmailTemplates.js'
 import { transporter, sender } from './email.config.js'
 export const sendVerificationEmail_user = async (email, verificationToken) => {
@@ -82,5 +83,28 @@ export const sendPasswordResetSuccessEmail = async (email, username) => {
   } catch (error) {
     console.error('Error sending verification email:', error.message);
     throw new Error('Failed to send verification email')
+  }
+}
+export const sendReleasedSongEmail = async (email, artistName, title,link)=>{
+  const recipient = email;
+  const mailOption = {
+  from: sender,
+  to: recipient,
+  html: SONG_RELEASE_REMINDER_TEMPLATE
+    .replace('{artistName}', artistName)
+    .replace('{songTitle}', songTitle)
+    .replace('{updateSongLinkURL}', updateSongLinkURL)
+};
+  try {
+    await transporter.sendMail(mailOption, (error, info)=>{
+    if(error){
+      console.log(error.message)
+    }else{
+      console.log('Email sent:', info.response)
+    }
+  })
+  } catch (error) {
+ console.error('Error sending song released update email:', error.message);
+    throw new Error('Failed to send released update email')
   }
 }

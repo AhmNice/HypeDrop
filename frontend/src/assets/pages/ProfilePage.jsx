@@ -51,6 +51,7 @@ const ProfilePage = () => {
     checkAuth();
   }, [picUpdataVisible]);
 
+
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       <Navbar activeTab={activeTab} />

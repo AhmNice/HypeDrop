@@ -1,5 +1,5 @@
 import express from 'express'
-import {  emailVerification, sendAuthenticatedAccount, updateProfile, updateProfilePicture, userForgotPassword, userLogin, userLogout, userRegistration, userResetPassword  } from '../controller/user.controller.js'
+import {  emailVerification, sendAuthenticatedAccount, updateDisplayNameOrEmail, updatePassword, updateProfile, updateProfilePicture, userForgotPassword, userLogin, userLogout, userRegistration, userResetPassword  } from '../controller/user.controller.js'
 import { verifyUserToken } from '../middleware/verifyToken.js'
 import { checkAuth } from '../middleware/checkAuth.js'
 import { createSnippet, deleteSnippet, getAllSnippets, getArtistSnippet, getSnippet, updateSnippet, updateSnippetLinks } from '../controller/snippet.controller.js'
@@ -36,4 +36,6 @@ router.post('/me/update-profilePicture', verifyUserToken, upload.single('profile
 router.post('/me/update-profile', verifyUserToken,  updateProfile)
 router.post('/me/get-notification', verifyUserToken, getUserNotifications)
 router.post('/me/read-notification', verifyUserToken, markNotificationAsRead)
+router.post('/change-password',verifyUserToken, updatePassword)
+router.post('/update-displayname-email',verifyUserToken, updateDisplayNameOrEmail)
 export default router

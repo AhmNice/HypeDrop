@@ -24,6 +24,8 @@ import AudioPage from "./assets/pages/AudioPage.jsx";
 import AboutPage from "./assets/pages/AboutPage.jsx";
 import TestimonyPage from "./assets/pages/TestimonyPage.jsx";
 import PageNotFound from "./assets/pages/PageNotFound.jsx";
+import SettingsPage from "./assets/pages/SettingsPage.jsx";
+import ChatPage from "./assets/pages/ChatPage.jsx";
 function App() {
   const { checkAuth, isAuthenticated, user, isCheckingAuth,error } = useAuthStore();
 
@@ -125,6 +127,22 @@ function App() {
           element={
             <ProtectedRoute>
               <UploadSnippetPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <SettingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chat"
+          element={
+            <ProtectedRoute>
+              <ChatPage />
             </ProtectedRoute>
           }
         />

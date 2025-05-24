@@ -140,7 +140,51 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
+  updatePassword: async (currentPassword, newPassword, userId) => {
+    const BASE_URL = `${BASE_API_URL}/change-password`;
+    set({
+      success: false,
+      isLoading: true,
+      error: null
+    })
+    try {
+      const { data } = await axios.post(BASE_URL, { currentPassword, newPassword, userId })
+      set({
+        success: true,
+        error: null,
+        isLoading: false
+      })
+    } catch (error) {
+      set({
+        success: false,
+        error: error.response?.data?.message || error.message,
+        isLoading: false
+      })
+    }
+  },
+  updateDisplayname_email: async (displayName, email, userId)=>{
+     const BASE_URL = `${BASE_API_URL}/update-displayname-email`;
+    set({
+      success: false,
+      isLoading: true,
+      error: null
+    })
+    try {
+        const { data } = await axios.post(BASE_URL, {displayName, email, userId});
+        set({
+          success:true,
+          error:null,
+          isLoading:false
+        })
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || 'Error',
+        success:false,
+        isLoading:false
+      })
+    }
 
+  },
   checkAuth: async () => {
     const BASE_URL = `${BASE_API_URL}/authenticatedAccount`;
 
