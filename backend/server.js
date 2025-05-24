@@ -31,6 +31,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api/auth', authRouter);
+app.get('/ping', (req, res) => {
+  res.status(200).send('pong');
+});
 
 // Start the server only after DB connects
 const startServer = async () => {
