@@ -67,7 +67,7 @@ const AudioPage = () => {
       ) : (
         <div className="text-center py-6 text-gray-500">Loading snippet...</div>
       )}
-      {snippet?.released === true && <Overlay snippet={snippet}/>}
+      {/* {snippet?.released === true && <Overlay snippet={snippet}/>} */}
     </section>
   );
 };
