@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import SongCard from '../components/SongCard';
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
+import Overlay from '../components/Overlay';
+
 
 const AudioPage = () => {
   const { id } = useParams();
@@ -43,9 +45,9 @@ const AudioPage = () => {
     <section className="bg-white">
       {error && <div className="text-red-500 text-center">{error}</div>}
 
-      {snippet && snippet.title ? (
+      {snippet && snippet?.title ? (
         <Helmet>
-          <title>{snippet.stageName+'-'+ snippet.title}</title>
+          <title>{snippet?.artistName+'-'+ snippet?.title}</title>
           <meta property="og:title" content={snippet.title} />
           <meta property="og:description" content={snippet.description || 'check this out snippet for my next single'} />
           <meta property="og:image" content={`${API_IMAGE_BASE_URL}/${snippet.cover_art}`} />
@@ -61,9 +63,11 @@ const AudioPage = () => {
 
       {snippet && snippet.title ? (
         <SongCard snippet={snippet} />
+
       ) : (
         <div className="text-center py-6 text-gray-500">Loading snippet...</div>
       )}
+      {snippet?.released === true && <Overlay snippet={snippet}/>}
     </section>
   );
 };

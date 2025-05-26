@@ -105,7 +105,7 @@ const SnippetCard2 = ({ snippet, handleToShare,
           {user?.role === 'artist' && <button onClick={() => setShowOption((prev) => !prev)} className="text-gray-400 hover:text-gray-600">
             <FiMoreVertical />
           </button>}
-          {showOptions ? (<OptionDiv snippet={snippet} />) : ''}
+          {showOptions ? (<OptionDiv snippet={snippet} />) : null }
         </div>
 
         <div className="flex justify-between items-center mt-4">

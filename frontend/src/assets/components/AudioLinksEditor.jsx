@@ -183,10 +183,12 @@ const AudioLinksEditor = ({ onClose, id, snippet }) => {
 
           <div className="mt-6">
             <h3 className="text-sm font-medium text-gray-700 mb-2">Your Links</h3>
-            {Object.keys(links).length > 0 ? (
+            {Object.entries(links).filter(([,url])=> url?.trim() !== '').length > 0 ? (
               <div className="flex overflow-auto h-36 scrollbar-thin">
                 <ul className="space-y-2 w-full">
-                  {Object.entries(links).map(([platformId, url]) => {
+                  {Object.entries(links)
+                  .filter(([,url]) => url?.trim() !== '')
+                  .map(([platformId, url]) => {
                     const platform = defaultPlatforms.find(p => p.id === platformId);
                     return (
                       <li key={platformId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">

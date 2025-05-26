@@ -44,9 +44,11 @@ const SettingsPage = () => {
   const handleSubmit = async () => {
     try {
       await updateDisplayname_email(accountForm.displayName, accountForm.email, user._id)
-
+      toast.success('Saved')
     } catch (error) {
       console.log(error.message)
+      toast.error(error.message)
+
     }
   };
   const settingsSections = [
@@ -87,16 +89,6 @@ const SettingsPage = () => {
       description: "Get help with your account",
     },
   ];
-  useEffect(()=>{
-    if(success){
-      toast.success('Saved')
-    }
-  },[success])
-  useEffect(()=>{
-    if(error){
-      toast.error(error)
-    }
-  },[error])
 
   const renderSectionContent = () => {
     switch (activeSection) {
